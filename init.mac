@@ -1,0 +1,84 @@
+.ifndef _INIT_MACROS
+_INIT_MACROS = 1
+    
+.include "defines.inc"
+    
+.macro unsafe_vblank_wait
+    .local until_vblank
+    
+until_vblank:
+    bit PPUSTAT
+    bpl until_vblank
+.endmacro
+
+.macro clear_mem
+    .local memory_loop
+    
+    ldx #$00
+memory_loop:
+    lda #$00
+    sta $0000, X
+    sta $0100, X
+    sta $0300, X
+    sta $0400, X
+    sta $0500, X
+    sta $0600, X
+    sta $0700, X
+
+    lda #$FE
+    sta $0200, X
+
+    inx
+    bne memory_loop
+.endmacro
+
+.macro clear_palette
+    .local cleardata
+    
+    lda PPUSTAT
+    ; Set PPU address to BG palette RAM ($3F00)
+    lda #$3F
+    sta PPUADDR
+    lda #$00
+    sta PPUADDR
+
+    ; loop counter
+    ldx #$20
+    lda #$00
+
+cleardata:
+    sta PPUDATA
+    dex
+    bne cleardata
+.endmacro
+
+.macro initialize_nes
+    sei
+    cld
+
+    ; Disable APU interrupts
+    ldx #$40
+    stx APUFCNT
+
+    ; Set the stack address
+    ldx #$ff
+    txs
+
+    ; Set X to zero through overflow,
+    ; use it to disable more registers
+    inx
+    stx PPUCTRL
+    stx PPUMASK
+    stx DMCFREQ
+
+    unsafe_vblank_wait 
+    clear_mem
+    unsafe_vblank_wait
+    clear_palette
+
+    ; Intensify green
+    lda #%01000000
+    sta PPUMASK
+.endmacro
+
+.endif

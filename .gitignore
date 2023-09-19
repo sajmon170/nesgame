@@ -1,0 +1,10 @@
+.ccls-cache/
+.ccls
+\#*
+vgcore*
+*.[oad]
+*.out
+*.elf
+*.exe
+*.nes
+program

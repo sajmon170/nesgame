@@ -1,0 +1,119 @@
+.ifndef _UTIL_MACROS
+_UTIL_MACROS = 1
+
+.import p1_input: zeropage
+.import p2_input: zeropage
+.import p1_old:   zeropage
+.import p2_old:   zeropage
+    
+.include "defines.inc"
+    
+.macro unsafe_vblank_wait
+    .local until_vblank
+    
+until_vblank:
+    bit PPUSTAT
+    bpl until_vblank
+.endmacro
+
+.macro clear_mem
+    .local memory_loop
+    
+    ldx #$00
+memory_loop:
+    lda #$00
+    sta $0000, X
+    sta $0100, X
+    sta $0300, X
+    sta $0400, X
+    sta $0500, X
+    sta $0600, X
+    sta $0700, X
+
+    lda #$FE
+    sta $0200, X
+
+    inx
+    bne memory_loop
+.endmacro
+
+.macro clear_palette
+    .local cleardata
+    
+    lda PPUSTAT
+    ; Set PPU address to BG palette RAM ($3F00)
+    lda #$3F
+    sta PPUADDR
+    lda #$00
+    sta PPUADDR
+
+    ; loop counter
+    ldx #$20
+    lda #$00
+
+cleardata:
+    sta PPUDATA
+    dex
+    bne cleardata
+.endmacro
+
+.macro initialize_nes
+    sei
+    cld
+
+    ; Disable APU interrupts
+    ldx #$40
+    stx APUFCNT
+
+    ; Set the stack address
+    ldx #$ff
+    txs
+
+    ; Set X to zero through overflow,
+    ; use it to disable more registers
+    inx
+    stx PPUCTRL
+    stx PPUMASK
+    stx DMCFREQ
+
+    unsafe_vblank_wait 
+    clear_mem
+    unsafe_vblank_wait
+    clear_palette
+.endmacro
+
+.macro read_controllers
+    .local loop
+    
+    ; This macro exploits OAM DMA for DPCM safety. Therefore,
+    ; it should be placed at the end of VBLANK after OAM DMA.
+    
+    ldx #$01
+    stx p1_old
+    stx JOYPAD1      ; player 2's buttons double as a ring counter
+    dex              ; X is now 0
+    stx JOYPAD1
+loop:
+    lda JOYPAD2
+    and #%00000011   ; ignore bits other than controller
+    cmp #$01         ; Set carry if and only if nonzero
+    rol p2_old, X    ; Carry -> bit 0; bit 7 -> Carry
+    lda JOYPAD1      ; Repeat
+    and #%00000011
+    cmp #$01
+    rol p1_old       ; Carry -> bit 0; bit 7 -> Carry
+    bcc loop
+
+    ; swap old with new
+    ldx p1_input
+    lda p1_old
+    sta p1_input
+    stx p1_old
+
+    ldx p2_input
+    lda p2_old
+    sta p2_input
+    stx p2_old
+.endmacro
+
+.endif

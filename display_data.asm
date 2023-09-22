@@ -1,25 +1,38 @@
 .export palettes
 .export sprites
+.export nametable
+
+.feature c_comments
 
 .segment "CODE"
 palettes:
-.byte $27 ; bg color
-.incbin "assets/bluecolors.pal"
-.byte $00, $00, $00
-.incbin "assets/bluecolors.pal"
-.incbin "assets/bluecolors.pal"
+/*
+.incbin "assets/bg.pal"
+.incbin "assets/bluetile.pal"
+.incbin "assets/bluetile.pal"
+.incbin "assets/bluetile.pal"
+*/
+
+.incbin "assets/level0.pal"
+.incbin "assets/level1.pal"
+.incbin "assets/level1.pal"
+.incbin "assets/level1.pal"
 
 pal1:
-.incbin "assets/player_part1.pal"
+.incbin "assets/player0.pal"
 pal2:
-.incbin "assets/player_part2.pal"
+.incbin "assets/player1.pal"
 
 sprites:
-.byte $08, $01, $00, $08
-.byte $08, $02, $00, $10
-.byte $10, $03, $00, $08
-.byte $10, $04, $00, $10
-.byte $18, $05, $01, $08
-.byte $18, $06, $01, $10
-.byte $20, $07, $01, $08
-.byte $20, $08, $01, $10
+.byte $08, $DA, $00, $08
+.byte $08, $DB, $00, $10
+.byte $10, $DC, $00, $08
+.byte $10, $DD, $00, $10
+.byte $18, $DE, $01, $08
+.byte $18, $DF, $01, $10
+.byte $20, $E0, $01, $08
+.byte $20, $E1, $01, $10
+
+nametable:
+.incbin "assets/level.bin"
+.incbin "assets/level_attr.bin"

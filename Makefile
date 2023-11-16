@@ -1,17 +1,17 @@
-ASMSOURCES  := $(wildcard *.asm)
-ASMOBJECTS  := $(patsubst %.asm,%.o,$(ASMSOURCES))
+ASMSOURCES  := $(wildcard *.s)
+ASMOBJECTS  := $(patsubst %.s,%.o,$(ASMSOURCES))
 
 .PHONY: all clean
 
-all: program
+all: game
 
 clean:
 	$(RM) $(ASMOBJECTS) $@.nes
 
-program: $(ASMOBJECTS)
+game: $(ASMOBJECTS)
 	ld65 $^ -o $@.nes $(LDFLAGS) -t nes
 
 -include $(CDEPENDS)
 
-%.o: %.asm
+%.o: %.s
 	ca65 $(ASMFLAGS) $<

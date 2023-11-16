@@ -9,6 +9,7 @@
 
 .segment "ZEROPAGE"
 mkvar local_vars, 16
+mkvar vblank_vars, 16
 
 ; Controller input bit map:
 ; |---|---|--------|-------|----|------|------|-------|

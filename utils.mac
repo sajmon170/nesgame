@@ -116,4 +116,22 @@ loop:
     stx p2_old
 .endmacro
 
+.macro store_registers
+    pha
+    txa
+    pha
+    tya
+    pha
+    php
+.endmacro
+
+.macro load_registers
+    plp
+    pla
+    tay
+    pla
+    tax
+    pla
+.endmacro
+
 .endif

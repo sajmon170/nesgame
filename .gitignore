@@ -7,4 +7,5 @@ vgcore*
 *.elf
 *.exe
 *.nes
+*.fdb
 program

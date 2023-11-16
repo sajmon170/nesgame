@@ -75,9 +75,7 @@ game_loop:
 .endproc
 
 .proc vblank_isr
-    ; TODO: - backup all registers
-    ;       - backup the flags
-    ;       - create separate variable space for vblank
+    store_registers
     
     lda #$02
     sta OAM_DMA
@@ -85,7 +83,8 @@ game_loop:
 
     lda #$01
     sta vblank_finished
-    
+
+    load_registers    
     rti
 .endproc
 

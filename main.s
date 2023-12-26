@@ -1,15 +1,22 @@
 .include "utils.mac"
 .feature c_comments
 
+; From: utils.mac
 .import read_controllers
-.import update_sprites
-.import palettes
-.import sprites
-; TODO - move this somewhere else
-.import nametable
-.import local_vars: zeropage
 
+; From: update_sprites.s
+.import update_sprites
+
+; From: loader.s
+.import load_level
+
+; From: zeropage.s
+.import local_vars: zeropage
 .import vblank_finished: zeropage
+
+; From: palettes.s
+.import palettes_data
+
 ; .import update_physics
 ; .import update_sprites
 
@@ -20,34 +27,9 @@
 .proc reset_isr
     initialize_nes
 
-    ; TODO: move this part into another function/game loop
-    ; ...or maybe move this into initialization code?
-    ; read status to reset the address latch
-    lda PPUSTAT 
-
-    ; set the PPU address to #3f00
-    lda #$3f
-    sta PPUADDR
-    lda #$00
-    sta PPUADDR
-
-    ldx #$00
-loadpalettes:
-    lda palettes, X
-    sta PPUDATA
-    inx
-    cpx #$20
-    bne loadpalettes
-
-    ldx #$00
-loadsprites:
-    lda sprites, X
-    sta $0200, X
-    inx
-    cpx #$20
-    bne loadsprites
-
-    jsr load_nametable
+    jsr load_palettes
+    jsr load_sprites
+    jsr load_level
 
     lda #$00
     sta PPUSCRL
@@ -69,7 +51,7 @@ game_loop:
     
     ; jsr update_logic
     ; jsr update_state
-    jsr update_sprites
+    ; jsr update_sprites
     jmp game_loop
 
 .endproc
@@ -79,8 +61,10 @@ game_loop:
     
     lda #$02
     sta OAM_DMA
-    read_controllers
 
+    ; Note: this macro exploits OAM DMA
+    ; => it cannot be moved outside of VBLANK
+    read_controllers
     lda #$01
     sta vblank_finished
 
@@ -88,31 +72,38 @@ game_loop:
     rti
 .endproc
 
-.proc load_nametable
-    lda PPUSTAT
-    lda #$20
+.proc load_palettes
+    ; read status to reset the address latch
+    lda PPUSTAT 
+
+    ; set the PPU address to #3f00
+    lda #$3f
     sta PPUADDR
     lda #$00
     sta PPUADDR
-
-    lda #<(nametable)
-    sta local_vars
-    lda #>(nametable)
-    sta local_vars + 1
     
-    ldy #$0
-    ldx #$0
-outer:
-inner:
-    lda (local_vars), Y
+    ldx #$00
+load:
+    lda palettes_data, X
     sta PPUDATA
-    iny
-    bne inner
-    
-    inc local_vars + 1
     inx
-    cpx #$04
-    bne outer
+    cpx #$20
+    bne load
+    
+    rts
+.endproc
 
+.proc load_sprites
+    ldx #$00
+
+load:
+    ; This only initializes the NES RAM's OAM region
+    ; => no OAM DMA is being done yet!
+    ; lda sprites, X
+    sta $0200, X
+    inx
+    cpx #$20
+    bne load
+    
     rts
 .endproc

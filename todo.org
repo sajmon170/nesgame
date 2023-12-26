@@ -1,0 +1,32 @@
+* TODO
+- [-] Implement an object system (no colliders!)
+  - [X] Create Metatile definitions
+  - [ ] Create Mob definitions
+    
+- [-] Implement a renderer
+  - [X] create palette definitions
+  - [X] generate nametable data
+    - [X] generate nametable
+    - [X] generate attribute table
+  - [ ] generate OAM data
+    
+- [-] Import a simple level
+  - [X] create a level
+  - [X] write an import procedure
+    (imports the whole level)
+  - [ ] write an update procedure
+    (updates only necessary sprites)
+    
+- [ ] Implement physics
+  - [ ] Implement sub-pixel movement
+  - [ ] Add constant gravity
+    - [ ] Add a multiplication subroutine
+  - [ ] Add a jump button
+  - [ ] Implement air and basic block colliders
+  - [ ] Add friction
+
+* File format
+- Screen split into 4 compressed chunks
+- Simplified: A screen is a single chunk
+- A chunk is composed of 240 metatiles
+- A metatile is represented as an index into the array of all available metatiles inside PRG ROM

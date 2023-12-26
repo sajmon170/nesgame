@@ -9,7 +9,7 @@ clean:
 	$(RM) $(ASMOBJECTS) $@.nes
 
 game: $(ASMOBJECTS)
-	ld65 $^ -o $@.nes $(LDFLAGS) -t nes
+	ld65 $^ -o $@.nes $(LDFLAGS) --config nes.cfg
 
 -include $(CDEPENDS)
 

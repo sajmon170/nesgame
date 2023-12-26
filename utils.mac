@@ -5,7 +5,7 @@ _UTIL_MACROS = 1
 .import p2_input: zeropage
 .import p1_old:   zeropage
 .import p2_old:   zeropage
-    
+ 
 .include "defines.inc"
     
 .macro unsafe_vblank_wait

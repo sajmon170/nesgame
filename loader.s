@@ -7,22 +7,47 @@
 
 ; From: level.s
 .import level
+.import level_tiles
 ; From: metatiles.s
 .import metatiles
 
 ; From: zeropage.s
 .import local_vars: zeropage
 
+.macro load_indirect_upper index, data
+    lda index, X
+    and #$0F
+    tay
+    lda (data), Y
+.endmacro
+
+.macro load_indirect_lower index, data
+    lda index, X
+    and #$F0
+    lsr
+    lsr
+    lsr
+    lsr
+    tay
+    lda (data), Y
+.endmacro
+
 .proc load_level
     ; local_vars[0:1] - metatile definitions structure address
     ; local_vars + 2 - temporary variable
     ; local_vars + 3 - current line number
     ; local_vars + 4 - attribute table entry
+    ; local_vars[5:6] - level tiles
     
     lda #<(metatiles)
     sta local_vars
     lda #>(metatiles)
     sta local_vars+1
+
+    lda #<(level_tiles)
+    sta local_vars+5
+    lda #>(level_tiles)
+    sta local_vars+6
 
     lda PPUSTAT
     lda #$20
@@ -41,14 +66,17 @@
             ; back-up column iterator
             pha 
 
-            ; A *= 5
             clc
-            lda level, X
+            ; A *= 5
+            lda level, X 
             and #$F0
             lsr
             lsr
             lsr
             lsr
+            tay
+            lda (local_vars+5), Y
+    
             sta local_vars+2
             asl
             asl
@@ -66,6 +94,8 @@
             clc
             lda level, X
             and #$0F
+            tay
+            lda (local_vars+5), Y
             sta local_vars+2
             asl
             asl
@@ -101,6 +131,8 @@
             lsr
             lsr
             lsr
+            tay
+            lda (local_vars+5), Y
             sta local_vars+2
             asl
             asl
@@ -119,6 +151,8 @@
             clc
             lda level, X
             and #$0F
+            tay
+            lda (local_vars+5), Y
             sta local_vars+2
             asl
             asl
@@ -177,6 +211,8 @@
             ; A = 5*A + 4 
             lda level, X
             and #$0F
+            tay
+            lda (local_vars+5), Y
             sta local_vars+2
             asl
             asl
@@ -199,6 +235,8 @@
             lsr
             lsr
             lsr
+            tay
+            lda (local_vars+5), Y
             sta local_vars+2
             asl
             asl
@@ -223,6 +261,8 @@
             ; A = 5*A + 4 
             lda level, X
             and #$0F
+            tay
+            lda (local_vars+5), Y
             sta local_vars+2
             asl
             asl
@@ -246,6 +286,8 @@
             lsr
             lsr
             lsr
+            tay
+            lda (local_vars+5), Y
             sta local_vars+2
             asl
             asl
@@ -271,8 +313,10 @@
             tax
             tya
             cmp #$08
-            bne inner_loop
+            beq outside
+            jmp inner_loop
 
+        outside:
         lda local_vars+3
         clc
         adc #$10

@@ -44,6 +44,11 @@
             ; A *= 5
             clc
             lda level, X
+            and #$F0
+            lsr
+            lsr
+            lsr
+            lsr
             sta local_vars+2
             asl
             asl
@@ -56,12 +61,29 @@
             iny
             lda (local_vars), Y
             sta PPUDATA
-            inx
+
+            ; A *= 5
+            clc
+            lda level, X
+            and #$0F
+            sta local_vars+2
+            asl
+            asl
+            adc local_vars+2
+            tay
+
+            ; load 2 next top tiles
+            lda (local_vars), Y
+            sta PPUDATA
+            iny
+            lda (local_vars), Y
+            sta PPUDATA
 
             ; column loop evaluation
+            inx
             pla
             adc #$1
-            cmp #$10
+            cmp #$08
             bne part1
 
 
@@ -70,39 +92,63 @@
         part2:
             ; back-up column iterator
             pha 
-    
+
             ; A *= 5
             clc
             lda level, X
+            and #$F0
+            lsr
+            lsr
+            lsr
+            lsr
             sta local_vars+2
             asl
             asl
             adc local_vars+2
+            adc #$02
             tay
 
             ; load 2 next bottom tiles
-            iny
-            iny
             lda (local_vars), Y
             sta PPUDATA
             iny
             lda (local_vars), Y
             sta PPUDATA
-            inx
+
+            ; A *= 5
+            clc
+            lda level, X
+            and #$0F
+            sta local_vars+2
+            asl
+            asl
+            adc local_vars+2
+            adc #$02
+            tay
+
+            ; load 2 next bottom tiles
+            lda (local_vars), Y
+            sta PPUDATA
+            iny
+            lda (local_vars), Y
+            sta PPUDATA
 
             ; column loop evaluation
+            inx
             pla
             adc #$1
-            cmp #$10
+            cmp #$08
             bne part2
 
         clc
         lda local_vars+3
-        adc #$10
+        adc #$08
         sta local_vars+3
-        cmp #$F0
-        bne load_nametable
+        cmp #$78
+        beq finish_loading
+        jmp load_nametable
 
+    finish_loading:
     ldx #$0 ; position column
     ldy #$0 ; position row
     clc
@@ -110,17 +156,7 @@
     
     ; Loading palettes
 
-    /*
-    lda #$00
-    tax
-et:
-    sta PPUDATA
-    inx
-    cpx #$40
-    bne et
-    */
-
-    lda #$11
+    lda #$8
     sta local_vars+3
 
     ; initialize row iterator
@@ -140,6 +176,7 @@ et:
 
             ; A = 5*A + 4 
             lda level, X
+            and #$0F
             sta local_vars+2
             asl
             asl
@@ -155,10 +192,13 @@ et:
             asl
             sta local_vars+4
 
-            dex
-
             ; A = 5*A + 4 
             lda level, X
+            and #$F0
+            lsr
+            lsr
+            lsr
+            lsr
             sta local_vars+2
             asl
             asl
@@ -177,11 +217,12 @@ et:
 
             txa
             clc
-            sbc #$0E
+            sbc #$07
             tax
 
             ; A = 5*A + 4 
             lda level, X
+            and #$0F
             sta local_vars+2
             asl
             asl
@@ -198,10 +239,13 @@ et:
             asl
             sta local_vars+4
 
-            dex
-
             ; A = 5*A + 4 
             lda level, X
+            and #$F0
+            lsr
+            lsr
+            lsr
+            lsr
             sta local_vars+2
             asl
             asl
@@ -220,24 +264,26 @@ et:
             ; column loop evaluation
             pla
             clc
-            adc #$02
+            adc #$01
             tay
             clc
             adc local_vars+3
             tax
             tya
-            cmp #$10
+            cmp #$08
             bne inner_loop
 
         lda local_vars+3
         clc
-        adc #$20
+        adc #$10
         sta local_vars+3
         pla
         clc
         adc #$01
         cmp #$08
-        bne load_palettes
-    
+        beq return
+        jmp load_palettes
+
+return:
     rts
 .endproc

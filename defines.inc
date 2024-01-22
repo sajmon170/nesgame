@@ -29,6 +29,9 @@ EMPH_GREEN = %01000000
 EMPH_RED   = %00100000
 ALLOW_SPR  = %00010000
 ALLOW_BG   = %00001000
+ALLOW_LSPR = %00000100
+ALLOW_LBG  = %00000010
+GRAYSCALE  = %00000001
 
 ; Nametables
 NAMETABLE0 = $2000
@@ -42,5 +45,15 @@ BTN_UP     = %00001000
 BTN_DOWN   = %00000100
 BTN_LEFT   = %00000010
 BTN_RIGHT  = %00000001
+
+; Physics constants
+; To avoid costly multiplication all objects are 
+; assumed to have the same mass of 60kg.
+
+; let T = 16/60 [s] be the basic unit of time.
+DELTA         = $01 << 5 ; [T] 
+GRAVITY_STEP  = $01 << 5 ; [adt] = [m/T]
+FRICTION_STEP = $01 << 4 ; [adt] = [m/T]
+PLAYER_PULL   = $01 << 3 ; [adt] = [m/T]
     
 .endif

@@ -41,7 +41,7 @@ mktile "player", "assets/chr/player.chr"
     tileid_3    .byte
     tileid_4    .byte
     palette_id  .byte
-;    collider_fn .word
+;    collider_fn .addr
 .endstruct
 
 nop

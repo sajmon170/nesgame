@@ -17,7 +17,8 @@
 ; From: palettes.s
 .import palettes_data
 
-; .import update_physics
+; From: physics.s
+.import update_physics
 ; .import update_sprites
 
 .export vblank_isr
@@ -39,7 +40,7 @@
 
     lda #ENABLE_NMI
     sta PPUCTRL
-    lda #ALLOW_SPR | ALLOW_BG
+    lda #ALLOW_SPR | ALLOW_BG | ALLOW_LSPR | ALLOW_LBG
     sta PPUMASK
 
 game_loop:
@@ -49,7 +50,7 @@ game_loop:
     lda #$00
     sta vblank_finished
     
-    ; jsr update_logic
+    ; jsr update_physics
     ; jsr update_state
     ; jsr update_sprites
     jmp game_loop

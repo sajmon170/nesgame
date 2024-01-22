@@ -28,3 +28,11 @@ mkvar p2_old
 
 ; TODO: store 8 booleans inside a single state byte
 mkvar vblank_finished
+
+; TODO: make a Vector2 struct
+; TODO: make an entity state struct
+mkvar player_pos_x, 2
+mkvar player_pos_y, 2
+mkvar player_speed_x, 2
+mkvar player_speed_y, 2
+mkvar player_on_ground

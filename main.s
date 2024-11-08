@@ -39,7 +39,7 @@
 
     lda #ENABLE_NMI
     sta PPUCTRL
-    lda #ALLOW_SPR | ALLOW_BG
+    lda #ALLOW_SPR | ALLOW_BG | ALLOW_LSPR | ALLOW_LBG
     sta PPUMASK
 
 game_loop:
